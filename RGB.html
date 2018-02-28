@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate True Random Numbers</title>
+  <script type="text/javascript">
+	var url1 = 'https://www.random.org/integers/?num=10000&min=0&max=16384&col=1&base=10&format=plain&rnd=new';
+	var url2 = 'https://www.random.org/integers/?num=6384&min=0&max=16384&col=1&base=10&format=plain&rnd=new';
+	fetch(url1)
+	  .then(response1 => response1.text())
+	  .then(response1 => {
+		return fetch(url2)
+		  .then(response2 => response2.text())
+		  .then(response2 => response1 + response2)
+		  .then(res => res.trim().split('\n'))
+	  })
+	  .then(function (res) {
+			alert("True Random numbers got:\n" + res);
+			const canvas = document.getElementById('generatedCanvas');
+			const context = canvas.getContext('2d');
+			var c_height = 128 ;
+			var c_width = 128 ;
+			var modifiedArray = new Uint8ClampedArray(c_height * c_width * 4);
+			for (height = 0; height < c_height; height++) {
+			for (width = 0; width < c_width; width++) {
+			  index = (( c_width * height ) + width) * 4;
+			  for (i = 0; i < 4; i++) {
+				modifiedArray[index + i] = Math.floor(res[height*width]/(i+1)) % 256;
+			  }
+			}
+			}
+			console.log("modifiedArray " + modifiedArray);
+			var image_data = context.createImageData(c_height, c_width);
+			image_data.data.set(modifiedArray);
+			context.putImageData(image_data, 0, 0);
+	   })
+    .catch(console.log)
+  </script>
+</head>
+<body>
+  <canvas id="generatedCanvas" height="128" width="128"></canvas>
+</body>
+</html>

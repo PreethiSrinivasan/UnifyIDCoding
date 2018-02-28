@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Generate True Random Numbers</title>
+	<script>
+		//function to check number is prime or not
+		function testIfPrime(n){
+		  if (n===1)
+			return false;
+		  else if(n === 2)
+			return true;
+		  else {
+			for(var x = 2; x < n; x++){
+			  if(n % x === 0)
+				return false;
+			}
+			return true;
+		  }
+		}
+
+		var url = 'https://www.random.org/integers/?num=10000&min=0&max=12&col=1&base=10&format=plain&rnd=new';
+		fetch(url)
+		  .then((res) => res.text())
+		  .then(res => res.toString())
+		  .then(res => {
+			//alert("True Random numbers received:\n" + res);
+		    var p=0, q=0, n, z, e, d, public_Key, private_Key, encryptedMessage, decryptMessage, msg=10;
+
+			//STEP 1 - get 2 random prime numbers from www.random.org
+			for (var i = 0; i < 10000; i++) {
+				if(testIfPrime(res[i]) && res[i]!=1 && res[i]!=0){
+					if(p==0)
+						p=res[i];
+					else {
+						q=res[i];
+						break;
+					}
+				}
+			}
+
+			//STEP 2 - multiply both prime numbers
+			n=p*q;
+
+			//STEP 3 - find Z so it is co-prime to n
+			z=(p-1)*(q-1);
+
+			//STEP 4 - find e such that 1<e<z and e should be co-prime to n
+			for (var i = 1; i < z; i++) {
+				if(i%n!=0){
+					e=i;
+					break;
+				}
+			}
+
+			//STEP 5 - find d such that (d X e) mod z = 1
+			for (var i = 1; i < z; i++) {
+				if((i*e)%z==1){
+					d=i;
+					break;
+				}
+			}
+
+			//STEP 6 - create public and private key
+			public_Key = {e:e,n:n};
+			private_Key = {d:d, n:n};
+
+			//STEP 7 - now using these key encrypt and decrypt the key
+			encryptedMessage = Math.pow(msg, e)%n;
+			decryptMessage = Math.pow(encryptedMessage, d)%n;
+			document.getElementById("encryptedMessage").innerHTML = "Encrypted Msg: "+encryptedMessage;
+		  })
+		  .catch(console.log)
+	</script>
+</head>
+<body>
+	<div>RSA algorithm implementation.</div>
+	<p>Input msg: 10</p><p id="encryptedMessage"></P>
+</body>
+</html>
